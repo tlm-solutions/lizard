@@ -9,7 +9,7 @@ craneLib.buildPackage {
   buildInputs = [ cmake protobuf grpc openssl pkg-config postgresql ];
 
   meta = {
-    description = "Tool to correlate the r09 telegrams to transmission locations";
-    homepage = "https://github.com/dump-dvb/lofi";
+    description = "Service which serves the current state of the network";
+    homepage = "https://github.com/tlm-solutions/lizard";
   };
 }
