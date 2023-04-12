@@ -66,7 +66,7 @@ in
           environment = {
             "RUST_LOG" = "${cfg.logLevel}";
             "REDIS_HOST" = "${cfg.redis.host}";
-            "REDIS_PORT" = "${toString cft.redis.port}"
+            "REDIS_PORT" = "${toString cfg.redis.port}";
             "HTTP_PORT" = "${toString cfg.port}";
             "WORKER_COUNT" = "${toString cfg.workerCount}";
           };

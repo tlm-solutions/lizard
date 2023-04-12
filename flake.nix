@@ -23,10 +23,7 @@
       lizard = package;
       default = package;
     };
-    nixosModules = rec {
-      default = funnel;
-      funnel = import ./nixos-module;
-    };
+
     devShells.default = pkgs.mkShell {
       nativeBuildInputs = (with packages.lizard; nativeBuildInputs ++ buildInputs);
     };
@@ -35,6 +32,10 @@
       default = apps.lizard;
     };
   }) // {
+    nixosModules = rec {
+      default = funnel;
+      funnel = import ./nixos-module;
+    };
     overlays.default = final: prev: {
       inherit (self.packages.${prev.system})
       lizard;
