@@ -11,14 +11,14 @@ use redis::{Client, Commands};
     get,
     path = "/vehicles/{region}/",
     params(
-        ("id" = i64, Path, description = "Identitier of the region")
+        ("region" = i64, Path, description = "Identitier of the region")
     ),
     responses(
         (status = 200, description = "list of vehicles"),
         (status = 500, description = "postgres pool error"),
     ),
 )]
-#[get("/vehicles/{region}")]
+//#[get("/vehicles/{region}")]
 pub async fn vehicles_list(
     _req: HttpRequest,
     path: web::Path<(i64,)>,
