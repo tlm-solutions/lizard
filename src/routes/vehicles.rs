@@ -24,6 +24,7 @@ pub async fn vehicles_list(
     path: web::Path<(i64,)>,
     redis_pool: web::Data<Client>,
 ) -> Result<web::Json<Vec<Waypoint>>, ServerError> {
+    info!("endpoint called!!!");
     let mut redis_connection = match redis_pool.get_connection() {
         Ok(value) => value,
         Err(e) => {
@@ -32,6 +33,7 @@ pub async fn vehicles_list(
         }
     };
 
+    info!("calling redis !!!");
     let waypoint_string: String = match redis_connection.get(format!("r{}", path.0)) {
         Ok(value) => value,
         Err(e) => {
@@ -41,7 +43,7 @@ pub async fn vehicles_list(
     };
 
     println!("found redis value {}", &waypoint_string);
-
+    info!("serializing");
     let waypoints = match serde_json::from_str(&waypoint_string) {
         Ok(value) => value,
         Err(e) => {

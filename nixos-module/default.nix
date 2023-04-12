@@ -64,6 +64,7 @@ in
           script = "exec ${pkgs.lizard}/bin/lizard --host ${cfg.http.host} --port ${toString cfg.http.port}&";
 
           environment = {
+            "RUST_BACKTRACE" = "1";
             "RUST_LOG" = "${cfg.logLevel}";
             "REDIS_HOST" = "${cfg.redis.host}";
             "REDIS_PORT" = "${toString cfg.redis.port}";
