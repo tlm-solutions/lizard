@@ -1,6 +1,6 @@
 { pkgs, config, lib, ... }:
 let
-  cfg = config.TLMS.api;
+  cfg = config.TLMS.lizard;
 in
 {
   options.TLMS.lizard = with lib; {
