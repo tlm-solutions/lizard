@@ -67,7 +67,7 @@ in
             "RUST_LOG" = "${cfg.logLevel}";
             "REDIS_HOST" = "${cfg.redis.host}";
             "REDIS_PORT" = "${toString cfg.redis.port}";
-            "HTTP_PORT" = "${toString cfg.port}";
+            "HTTP_PORT" = "${toString cfg.http.port}";
             "WORKER_COUNT" = "${toString cfg.workerCount}";
           };
 
