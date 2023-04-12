@@ -16,7 +16,7 @@ use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use redis::cluster::ClusterClient;
+use redis::Client;
 
 /// this function reads the uri specifier for the redis instance from env variables
 pub fn get_redis_uri() -> String {
@@ -31,9 +31,9 @@ pub fn get_redis_uri() -> String {
 }
 
 /// returns the redis connection pool
-pub fn connect_to_redis() -> Option<ClusterClient> {
-    let redis_uri = vec![get_redis_uri()];
-    ClusterClient::new(redis_uri).ok()
+pub fn connect_to_redis() -> Option<Client> {
+    let redis_uri = get_redis_uri();
+    Client::open(redis_uri).ok()
 }
 
 pub fn get_prometheus() -> PrometheusMetrics {
