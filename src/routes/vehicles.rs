@@ -2,7 +2,7 @@ use crate::routes::ServerError;
 
 use tlms::locations::waypoint::Waypoint;
 
-use actix_web::{web, HttpRequest};
+use actix_web::{web, HttpRequest, get};
 use log::error;
 use redis::{cluster::ClusterClient, Commands};
 
@@ -18,6 +18,7 @@ use redis::{cluster::ClusterClient, Commands};
         (status = 500, description = "postgres pool error"),
     ),
 )]
+#[get("/vehicles/{region}/")]
 pub async fn vehicles_list(
     _req: HttpRequest,
     path: web::Path<(i64,)>,
