@@ -40,7 +40,7 @@ pub async fn vehicles_list(
         }
     };
 
-    info!("found redis value {}", &waypoint_string);
+    println!("found redis value {}", &waypoint_string);
 
     let waypoints = match serde_json::from_str(&waypoint_string) {
         Ok(value) => value,
