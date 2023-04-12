@@ -9,7 +9,7 @@ use redis::{Client, Commands};
 /// will return a list of all vehicles inside this region with their last seen position
 #[utoipa::path(
     get,
-    path = "/vehicles/{region}/",
+    path = "/v1/vehicles/{region}/",
     params(
         ("region" = i64, Path, description = "Identitier of the region")
     ),
@@ -32,7 +32,7 @@ pub async fn vehicles_list(
         }
     };
 
-    let waypoints: Vec<String> = match redis_connection.get(format!("r{}", path.0)) {
+    let waypoints: String = match redis_connection.get(format!("r{}", path.0)) {
         Ok(value) => value,
         Err(e) => {
             error!("cannot find region with this key {:?}", e);
@@ -41,9 +41,12 @@ pub async fn vehicles_list(
     };
 
     Ok(web::Json(
-        waypoints
-            .iter()
-            .map(|x| serde_json::from_str(x).unwrap())
-            .collect(),
+        match serde_json::from_str(&waypoints) {
+            Ok(value) => value,
+            Err(e) => {
+                error!("cannot deserialize value from redis with error {:?} and value {}", e, &waypoints);
+                return Err(ServerError::InternalError);
+            }
+        }
     ))
 }
