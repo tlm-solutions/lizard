@@ -75,9 +75,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .app_data(redis_connectionpool.clone())
             .service(
-                web::scope("/v1")
-                    .route("/vehicles/{id}", web::get().to(routes::vehicles::vehicles_list))
-                    //.service(routes::vehicles::vehicles_list)
+                web::scope("/v1").route(
+                    "/vehicles/{id}",
+                    web::get().to(routes::vehicles::vehicles_list),
+                ), //.service(routes::vehicles::vehicles_list)
             )
             .service(
                 SwaggerUi::new("/swagger-ui/{_:.*}")

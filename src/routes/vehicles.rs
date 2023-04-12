@@ -2,8 +2,8 @@ use crate::routes::ServerError;
 
 use tlms::locations::waypoint::Waypoint;
 
-use actix_web::{web, HttpRequest, get};
-use log::error;
+use actix_web::{get, web, HttpRequest};
+use log::{error, info};
 use redis::{Client, Commands};
 
 /// will return a list of all vehicles inside this region with their last seen position
@@ -32,7 +32,7 @@ pub async fn vehicles_list(
         }
     };
 
-    let waypoints: String = match redis_connection.get(format!("r{}", path.0)) {
+    let waypoint_string: String = match redis_connection.get(format!("r{}", path.0)) {
         Ok(value) => value,
         Err(e) => {
             error!("cannot find region with this key {:?}", e);
@@ -40,13 +40,18 @@ pub async fn vehicles_list(
         }
     };
 
-    Ok(web::Json(
-        match serde_json::from_str(&waypoints) {
-            Ok(value) => value,
-            Err(e) => {
-                error!("cannot deserialize value from redis with error {:?} and value {}", e, &waypoints);
-                return Err(ServerError::InternalError);
-            }
+    info!("found redis value {}", &waypoint_string);
+
+    let waypoints = match serde_json::from_str(&waypoint_string) {
+        Ok(value) => value,
+        Err(e) => {
+            error!(
+                "cannot deserialize value from redis with error {:?} and value {}",
+                e, &waypoint_string
+            );
+            return Err(ServerError::InternalError);
         }
-    ))
+    };
+
+    Ok(web::Json(waypoints))
 }
