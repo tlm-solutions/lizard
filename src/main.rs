@@ -73,7 +73,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .wrap(prometheus.clone())
             .wrap(Logger::default())
-            .app_data(redis_connectionpool.clone())
+            .app_data(web::Data::new(redis_connectionpool.clone()))
             .service(
                 web::scope("/v1").route(
                     "/vehicles/{id}",
