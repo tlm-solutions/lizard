@@ -74,12 +74,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(prometheus.clone())
             .wrap(Logger::default())
             .app_data(web::Data::new(redis_connectionpool.clone()))
-            .service(
-                web::scope("/v1").route(
-                    "/vehicles/{id}",
-                    web::get().to(routes::vehicles::vehicles_list),
-                ), //.service(routes::vehicles::vehicles_list)
-            )
+            .service(web::scope("/v1").service(routes::vehicles::vehicles_list))
             .service(
                 SwaggerUi::new("/swagger-ui/{_:.*}")
                     .url("/api-doc/openapi.json", routes::ApiDoc::openapi()),

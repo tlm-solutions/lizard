@@ -27,6 +27,7 @@
     devShells.default = pkgs.mkShell {
       nativeBuildInputs = (with packages.lizard; nativeBuildInputs ++ buildInputs);
     };
+
     apps = {
       lizard = utils.lib.mkApp { drv = packages.lizard; };
       default = apps.lizard;

@@ -3,7 +3,7 @@ use crate::routes::ServerError;
 use tlms::locations::waypoint::Waypoint;
 
 use actix_web::{get, web, HttpRequest};
-use log::{error, info};
+use log::error;
 use redis::{Client, Commands};
 
 /// will return a list of all vehicles inside this region with their last seen position
@@ -18,13 +18,12 @@ use redis::{Client, Commands};
         (status = 500, description = "postgres pool error"),
     ),
 )]
-//#[get("/vehicles/{region}")]
+#[get("/vehicles/{region}")]
 pub async fn vehicles_list(
     _req: HttpRequest,
     path: web::Path<(i64,)>,
     redis_pool: web::Data<Client>,
 ) -> Result<web::Json<Vec<Waypoint>>, ServerError> {
-    info!("endpoint called!!!");
     let mut redis_connection = match redis_pool.get_connection() {
         Ok(value) => value,
         Err(e) => {
@@ -33,7 +32,6 @@ pub async fn vehicles_list(
         }
     };
 
-    info!("calling redis !!!");
     let waypoint_string: String = match redis_connection.get(format!("r{}", path.0)) {
         Ok(value) => value,
         Err(e) => {
@@ -42,8 +40,6 @@ pub async fn vehicles_list(
         }
     };
 
-    println!("found redis value {}", &waypoint_string);
-    info!("serializing");
     let waypoints = match serde_json::from_str(&waypoint_string) {
         Ok(value) => value,
         Err(e) => {
