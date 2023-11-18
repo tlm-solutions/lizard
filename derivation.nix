@@ -1,12 +1,13 @@
-{ craneLib, src, lib, cmake, pkg-config, protobuf, grpc, openssl, postgresql}:
+{ buildPackage, lib, pkg-config, cmake, protobuf, postgresql, zlib, openssl}:
 
-craneLib.buildPackage {
+buildPackage {
   pname = "lizard";
   version = "0.1.0";
 
   src = ./.;
 
-  buildInputs = [ cmake protobuf grpc openssl pkg-config postgresql ];
+  #cargoSha256 = lib.fakeSha256;
+  buildInputs = [ cmake protobuf openssl pkg-config postgresql ];
 
   meta = {
     description = "Service which serves the current state of the network";

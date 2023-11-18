@@ -1,45 +1,62 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-    utils.url = "github:numtide/flake-utils";
-    crane = {
-      url = "github:ipetkov/crane";
+
+    naersk = {
+      url = "github:nix-community/naersk";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "utils";
+    };
+
+    utils = {
+      url = "github:numtide/flake-utils";
+    };
+
+    fenix = {
+      url = "github:nix-community/fenix";
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, utils, crane }:
+  outputs = inputs@{ self, nixpkgs, utils, naersk, fenix }:
     utils.lib.eachDefaultSystem
-    (system:
-    let
-      pkgs = nixpkgs.legacyPackages.${system};
-      craneLib = crane.lib.${system};
-      package = pkgs.callPackage ./derivation.nix { craneLib = craneLib; };
-    in
-    rec {
-    checks = packages;
-    packages = {
-      lizard = package;
-      default = package;
-    };
+      (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
 
-    devShells.default = pkgs.mkShell {
-      nativeBuildInputs = (with packages.lizard; nativeBuildInputs ++ buildInputs);
-    };
+          toolchain = with fenix.packages.${system}; combine [
+            latest.cargo
+            latest.rustc
+          ];
 
-    apps = {
-      lizard = utils.lib.mkApp { drv = packages.lizard; };
-      default = apps.lizard;
+          package = pkgs.callPackage ./derivation.nix {
+            buildPackage = (naersk.lib.${system}.override {
+              cargo = toolchain;
+              rustc = toolchain;
+            }).buildPackage;
+          };
+        in
+        rec {
+          checks = packages;
+          packages = {
+            lizard = package;
+            default = package;
+          };
+
+          devShells.default = pkgs.mkShell {
+            nativeBuildInputs = (with packages.lizard; nativeBuildInputs ++ buildInputs);
+          };
+
+          apps = {
+            lizard = utils.lib.mkApp { drv = packages.lizard; };
+            default = apps.lizard;
+          };
+        }) // {
+      nixosModules = rec {
+        default = funnel;
+        funnel = import ./nixos-module;
+      };
+      overlays.default = final: prev: {
+        inherit (self.packages.${prev.system})
+          lizard;
+      };
     };
-  }) // {
-    nixosModules = rec {
-      default = funnel;
-      funnel = import ./nixos-module;
-    };
-    overlays.default = final: prev: {
-      inherit (self.packages.${prev.system})
-      lizard;
-    };
-  };
 }
