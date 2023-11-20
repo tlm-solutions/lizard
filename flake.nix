@@ -39,6 +39,12 @@
           packages = {
             lizard = package;
             default = package;
+            docs = (pkgs.nixosOptionsDoc {
+              options = (nixpkgs.lib.nixosSystem {
+                inherit system;
+                modules = [ self.nixosModules.default ];
+              }).options.TLMS;
+            }).optionsCommonMark;
           };
 
           devShells.default = pkgs.mkShell {
