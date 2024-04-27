@@ -89,5 +89,6 @@ in
       isSystemUser = true;
       extraGroups = [ ];
     };
+    users.groups."${cfg.group}" = {};
   };
 }
