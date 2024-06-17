@@ -1,4 +1,4 @@
-name: "decode-server"
+name: "lizard"
 
 on:
   push:
@@ -15,4 +15,4 @@ jobs:
         with:
           name: dump-dvb
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: nix build -vL .#telegram-decoder
+      - run: nix build -vL .#lizard
