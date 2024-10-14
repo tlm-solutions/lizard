@@ -1,3 +1,4 @@
+pub mod gtfs;
 pub mod vehicles;
 
 use actix_web::{
