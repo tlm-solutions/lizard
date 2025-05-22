@@ -1,38 +1,19 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-
-    naersk = {
-      url = "github:nix-community/naersk";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
     utils = {
       url = "github:numtide/flake-utils";
     };
-
-    fenix = {
-      url = "github:nix-community/fenix";
-    };
   };
 
-  outputs = inputs@{ self, nixpkgs, utils, naersk, fenix }:
+  outputs = inputs@{ self, nixpkgs, utils }:
     utils.lib.eachDefaultSystem
       (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
 
-          toolchain = with fenix.packages.${system}; combine [
-            latest.cargo
-            latest.rustc
-          ];
-
-          package = pkgs.callPackage ./derivation.nix {
-            buildPackage = (naersk.lib.${system}.override {
-              cargo = toolchain;
-              rustc = toolchain;
-            }).buildPackage;
-          };
+          package = pkgs.callPackage ./package.nix { };
 
           test-vm-pkg = self.nixosConfigurations.lizard-mctest.config.system.build.vm;
         in
@@ -42,24 +23,24 @@
             lizard = package;
             test-vm = test-vm-pkg;
             test-vm-wrapper = pkgs.writeScript "trekkie-test-vm-wrapper"
-            ''
-              set -e
+              ''
+                set -e
 
-              echo Trekkie-McTest: enterprise-grade, free-range, grass fed testing vm
-              echo
-              echo "ALL RELEVANT SERVICES WILL BE EXPOSED TO THE HOST:"
-              echo -e "Service\t\tPort"
-              echo -e "SSH:\t\t2222\troot:lol"
-              echo -e "lizard:\t8060"
-              echo -e "redis:\t\t8061"
-              echo
+                echo Trekkie-McTest: enterprise-grade, free-range, grass fed testing vm
+                echo
+                echo "ALL RELEVANT SERVICES WILL BE EXPOSED TO THE HOST:"
+                echo -e "Service\t\tPort"
+                echo -e "SSH:\t\t2222\troot:lol"
+                echo -e "lizard:\t8060"
+                echo -e "redis:\t\t8061"
+                echo
 
-              set -x
-              export QEMU_NET_OPTS="hostfwd=tcp::2222-:22,hostfwd=tcp::8060-:8060,hostfwd=tcp::8061-:6379"
+                set -x
+                export QEMU_NET_OPTS="hostfwd=tcp::2222-:22,hostfwd=tcp::8060-:8060,hostfwd=tcp::8061-:6379"
 
-              echo "running the vm now..."
-              ${self.packages.${system}.test-vm}/bin/run-nixos-vm
-            '';
+                echo "running the vm now..."
+                ${self.packages.${system}.test-vm}/bin/run-nixos-vm
+              '';
             default = package;
             docs = (pkgs.nixosOptionsDoc {
               options = (nixpkgs.lib.nixosSystem {
